@@ -1,3 +1,12 @@
+# vs code
+.vscode
+
+# clion
+.idea
+
+# mac os
+.DS_Store
+
 # Prerequisites
 *.d
 
