@@ -39,7 +39,7 @@ void setup() {
   mcp2515.setNormalMode();
 
   // Attach interrupt
-  attachInterrupt(digitalPinToInterrupt(CAN_INT), printMessage, FALLING);
+  attachInterrupt(digitalPinToInterrupt(CAN_INT), canFunc, FALLING);
   
   // Print header
   Serial.println("CAN Injector");
@@ -49,13 +49,50 @@ void setup() {
 
 /** @brief Arduino Loop */
 void loop() {
-  sendMessage(Serial.readString());
-  
+    if (Serial.available() > 0) {
+        String message = Serial.readString();
+        
+        if (message.indexOf("CMD-Send: ") != -1) {
+            message.replace("CMD-Send: ", "");
+
+            // Send Message
+            sendMessage(message);
+
+        }
+    }
+}
+
+/** @brief CAN received */
+void canFunc() {
+    if (!getCANMessage()) { return; }
+
+}
+
+/**
+ * @brief Get the CAN message if the id is correct
+ * 
+ * @return true If message is valid and id's match
+ * @return false If message is invalid or id's do not match
+ */
+
+bool getCANMessage() {
+    if (can_trans -> readMessage(&can_msg_in) == MCP2515::ERROR_OK) {
+        if (can_msg_in.can_id == m_can_id) {
+            // Print Message
+            printReceivedCANMessage();
+
+            return true;
+
+        } 
+    }
+
+    return false;
+
 }
 
 /** @brief Print out the received can frame*/
-void printMessage() {
-  // Start log
+void printReceivedCANMessage() {
+    // Start log
     Serial.print("CAN-RX: (" + String(can_msg_in.can_id) + ") ");
 
     // Print data
