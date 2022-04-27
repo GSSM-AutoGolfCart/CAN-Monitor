@@ -77,13 +77,11 @@ void canFunc() {
 
 bool getCANMessage() {
     if (mcp2515.readMessage(&can_msg_in) == MCP2515::ERROR_OK) {
-        if (can_msg_in.can_id == m_can_id) {
-            // Print Message
-            printReceivedCANMessage();
+        // Print Message
+        printReceivedCANMessage();
 
-            return true;
-
-        } 
+        return true;
+        
     }
 
     return false;
